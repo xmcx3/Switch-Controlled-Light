@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import pytest
-
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_HS_COLOR,
+)
+from homeassistant.components.light import (
     DOMAIN as LIGHT_DOMAIN,
 )
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
@@ -19,9 +20,10 @@ from homeassistant.const import (
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import Event, HomeAssistant, ServiceCall
+from homeassistant.core import Event, HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.setup import async_setup_component
+from tests.common import MockConfigEntry
 
 from custom_components.switch_controlled_light.const import (
     CONF_CLOSE_TIMER,
@@ -29,8 +31,6 @@ from custom_components.switch_controlled_light.const import (
     CONF_SWITCHES,
     DOMAIN,
 )
-
-from tests.common import MockConfigEntry
 
 pytestmark = pytest.mark.usefixtures("hass_states")
 
