@@ -27,6 +27,7 @@ from homeassistant.components.light import (
     ATTR_XY_COLOR,
     ColorMode,
     LightEntity,
+    LightEntityFeature,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -187,10 +188,26 @@ class SwitchControlledLight(LightEntity):
         self._attr_effect_list = attrs.get(ATTR_EFFECT_LIST)
         self._attr_effect = attrs.get(ATTR_EFFECT)
 
+        color_mode = attrs.get(ATTR_COLOR_MODE)
         if (supported := attrs.get(ATTR_SUPPORTED_COLOR_MODES)) is not None:
             self._attr_supported_color_modes = set(supported)
-        self._attr_color_mode = attrs.get(ATTR_COLOR_MODE)
-        self._attr_supported_features = attrs.get("supported_features")
+            if color_mode is None:
+                # Some lights omit color_mode from their state; fall back to the
+                # first supported mode so HA's on-state validation passes.
+                self._attr_color_mode = (
+                    next(iter(self._attr_supported_color_modes))
+                    if len(self._attr_supported_color_modes) == 1
+                    else ColorMode.UNKNOWN
+                )
+            else:
+                self._attr_color_mode = color_mode
+        elif color_mode is not None:
+            self._attr_color_mode = color_mode
+        self._attr_supported_features = (
+            LightEntityFeature(0)
+            if (features := attrs.get("supported_features")) is None
+            else LightEntityFeature(features)
+        )
 
     async def _restart_timer(self) -> None:
         """Restart the configured auto-close timer, if any."""

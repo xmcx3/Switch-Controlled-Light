@@ -30,15 +30,9 @@ async def mock_dependencies(hass: HomeAssistant) -> AsyncMock:
     hass.states.async_set("timer.kitchen_auto_off", "idle")
 
     registry = er.async_get(hass)
-    registry.async_get_or_create(
-        domain="switch", platform="test", unique_id="k1"
-    )
-    registry.async_get_or_create(
-        domain="light", platform="test", unique_id="l1"
-    )
-    registry.async_get_or_create(
-        domain="timer", platform="test", unique_id="t1"
-    )
+    registry.async_get_or_create(domain="switch", platform="test", unique_id="k1")
+    registry.async_get_or_create(domain="light", platform="test", unique_id="l1")
+    registry.async_get_or_create(domain="timer", platform="test", unique_id="t1")
     return AsyncMock()
 
 
@@ -67,7 +61,9 @@ async def test_create_entry(hass: HomeAssistant) -> None:
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert result["title"] == "Kitchen"
-    assert result["data"] == {
+    # SchemaConfigFlowHandler stores the user input in ``options``, leaving
+    # ``data`` empty.
+    assert result["options"] == {
         CONF_NAME: "Kitchen",
         CONF_SWITCHES: ["switch.kitchen"],
         CONF_CONTROL_LIGHTS: "light.kitchen_ceiling",
