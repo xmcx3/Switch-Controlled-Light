@@ -1,0 +1,33 @@
+{
+    "config": {
+        "flow_title": "Switch Controlled Light: {name}",
+        "step": {
+            "user": {
+                "title": "Switch Controlled Light",
+                "description": "Create a virtual light that is only on when every selected switch is on. State, brightness, color and effects mirror the chosen light entity.",
+                "data": {
+                    "name": "Name",
+                    "switches": "Required switches",
+                    "control_lights": "Controlled light",
+                    "timer": "Auto-close timer (optional)"
+                }
+            }
+        },
+        "abort": {
+            "already_configured": "This switch controlled light is already configured."
+        }
+    },
+    "options": {
+        "step": {
+            "user": {
+                "title": "Switch Controlled Light",
+                "description": "Update the switches, controlled light and optional auto-close timer.",
+                "data": {
+                    "switches": "Required switches",
+                    "control_lights": "Controlled light",
+                    "timer": "Auto-close timer (optional)"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,11 @@
+{
+  "domain": "switch_controlled_light",
+  "name": "Switch Controlled Light",
+  "codeowners": ["@xmcx3"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/xmcx3/switch_controlled_light",
+  "issue_tracker": "https://github.com/xmcx3/switch_controlled_light/issues",
+  "integration_type": "helper",
+  "iot_class": "local_push"
+}
