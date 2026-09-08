@@ -11,13 +11,20 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers import entity_registry as er
 
-from custom_components.switch_controlled_light.const import (
-    CONF_CLOSE_TIMER,
-    CONF_CONTROL_LIGHTS,
-    CONF_SWITCHES,
-    DOMAIN,
-)
-
+try:
+    from homeassistant.components.switch_controlled_light.const import (
+        CONF_CLOSE_TIMER,
+        CONF_CONTROL_LIGHTS,
+        CONF_SWITCHES,
+        DOMAIN,
+    )
+except ImportError:
+    from custom_components.switch_controlled_light.const import (
+        CONF_CLOSE_TIMER,
+        CONF_CONTROL_LIGHTS,
+        CONF_SWITCHES,
+        DOMAIN,
+    )
 pytestmark = pytest.mark.usefixtures("mock_dependencies")
 
 
