@@ -168,7 +168,7 @@ class SwitchControlledLight(LightEntity):
         ]
         all_states = [light_state, *switch_states]
 
-        self._attr_available = all(state.state != STATE_UNAVAILABLE for state in all_states)
+        self._attr_available = all(state.state != STATE_UNAVAILABLE for state in switch_states)
         self._attr_is_on = all(state.state == STATE_ON for state in all_states)
 
         attrs = light_state.attributes

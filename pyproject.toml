@@ -1,6 +1,6 @@
 [project]
 name = "switch-controlled-light"
-version = "0.1.0"
+version = "0.2.0"
 description = "Virtual light entity mirroring a light while every required switch is on."
 readme = "README.md"
 requires-python = ">=3.13"
