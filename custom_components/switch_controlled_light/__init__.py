@@ -40,9 +40,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         )
 
     if timer_entity_id:
-        entry.async_on_unload(
-            hass.bus.async_listen(timer.EVENT_TIMER_FINISHED, auto_close_switch)
-        )
+        entry.async_on_unload(hass.bus.async_listen(timer.EVENT_TIMER_FINISHED, auto_close_switch))
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True

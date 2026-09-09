@@ -92,8 +92,6 @@ async def test_duplicate_aborted(hass: HomeAssistant) -> None:
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], user_input
-    )
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], user_input)
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "already_configured"

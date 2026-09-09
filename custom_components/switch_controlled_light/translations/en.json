@@ -19,7 +19,7 @@
     },
     "options": {
         "step": {
-            "user": {
+            "init": {
                 "title": "Switch Controlled Light",
                 "description": "Update the switches, controlled light and optional auto-close timer.",
                 "data": {

@@ -21,6 +21,7 @@ from homeassistant.const import (
     STATE_ON,
 )
 from homeassistant.core import Event, HomeAssistant
+from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers import entity_registry as er
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -185,3 +186,38 @@ async def test_turn_off_only_targets_controlled_light(hass: HomeAssistant) -> No
     timer_calls = [c for c in calls if c["domain"] == TIMER_DOMAIN]
     assert len(timer_calls) == 2  # cancel + start
     assert {c["service"] for c in timer_calls} == {"cancel", "start"}
+
+
+async def test_options_flow_updates_and_reloads_entry(hass: HomeAssistant) -> None:
+    """Options flow updates entry.options and reloads so new switches take effect."""
+    entry = await _setup_entry(hass)
+
+    # A new switch we'll switch to; the original kitchen_b will be dropped.
+    hass.states.async_set("switch.kitchen_c", STATE_OFF, {"friendly_name": "C"})
+    registry = er.async_get(hass)
+    registry.async_get_or_create(domain="switch", platform="test", unique_id="c")
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    assert result["type"] == FlowResultType.FORM
+    assert result["step_id"] == "init"
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={
+            CONF_SWITCHES: ["switch.kitchen_a", "switch.kitchen_c"],
+            CONF_CONTROL_LIGHTS: "light.kitchen_ceiling",
+        },
+    )
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    await hass.async_block_till_done()
+
+    # Entry options reflect the submission and the entry was reloaded cleanly.
+    assert entry.options[CONF_SWITCHES] == ["switch.kitchen_a", "switch.kitchen_c"]
+    assert CONF_CLOSE_TIMER not in entry.options
+    assert entry.state is ConfigEntryState.LOADED
+
+    # The virtual light now considers kitchen_c (off) instead of kitchen_b.
+    # With kitchen_a on and kitchen_c off, the virtual light must be off.
+    state = hass.states.get("light.kitchen")
+    assert state is not None
+    assert state.state == STATE_OFF
