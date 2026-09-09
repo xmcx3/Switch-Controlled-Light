@@ -1,0 +1,33 @@
+{
+    "config": {
+        "flow_title": "开关控制灯: {name}",
+        "step": {
+            "user": {
+                "title": "开关控制灯",
+                "description": "创建一个虚拟灯,只有当所有选中的开关都处于开启状态时它才会亮起。其状态、亮度、颜色和效果会镜像所选灯实体。",
+                "data": {
+                    "name": "名称",
+                    "switches": "必需的开关",
+                    "control_lights": "受控灯",
+                    "timer": "自动关闭定时器(可选)"
+                }
+            }
+        },
+        "abort": {
+            "already_configured": "此开关控制灯已经配置过了。"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "开关控制灯",
+                "description": "更新所需的开关、受控灯以及可选的自动关闭定时器。",
+                "data": {
+                    "switches": "必需的开关",
+                    "control_lights": "受控灯",
+                    "timer": "自动关闭定时器(可选)"
+                }
+            }
+        }
+    }
+}
