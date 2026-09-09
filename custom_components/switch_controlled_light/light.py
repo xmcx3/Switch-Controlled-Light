@@ -112,9 +112,7 @@ class SwitchControlledLight(LightEntity):
         # Until the controlled light has reported state we cannot derive
         # accurate capabilities; fall back to on/off as the safe default.
         self._attr_color_mode: ColorMode | str | None = ColorMode.UNKNOWN
-        self._attr_supported_color_modes: set[ColorMode | str] | None = {
-            ColorMode.ONOFF
-        }
+        self._attr_supported_color_modes: set[ColorMode | str] | None = {ColorMode.ONOFF}
 
         self._attr_unique_id = f"{entry_id}_{control_light_entity_id}"
         self._attr_device_info = DeviceInfo(
@@ -170,9 +168,7 @@ class SwitchControlledLight(LightEntity):
         ]
         all_states = [light_state, *switch_states]
 
-        self._attr_available = all(
-            state.state != STATE_UNAVAILABLE for state in all_states
-        )
+        self._attr_available = all(state.state != STATE_UNAVAILABLE for state in all_states)
         self._attr_is_on = all(state.state == STATE_ON for state in all_states)
 
         attrs = light_state.attributes
@@ -231,16 +227,13 @@ class SwitchControlledLight(LightEntity):
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the virtual light on by energizing switches and the controlled light."""
-        service_data = {
-            key: value for key, value in kwargs.items() if key in FORWARDED_ATTRIBUTES
-        }
+        service_data = {key: value for key, value in kwargs.items() if key in FORWARDED_ATTRIBUTES}
         service_data[ATTR_ENTITY_ID] = self._control_light_entity_id
 
         off_switches = [
             switch_id
             for switch_id in self._switch_entity_ids
-            if (state := self._hass.states.get(switch_id)) is not None
-            and state.state == STATE_OFF
+            if (state := self._hass.states.get(switch_id)) is not None and state.state == STATE_OFF
         ]
 
         await self._hass.services.async_call(

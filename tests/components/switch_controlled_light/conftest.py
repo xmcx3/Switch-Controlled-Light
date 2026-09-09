@@ -14,14 +14,14 @@ from collections.abc import Generator
 import pytest
 
 try:
-    from pytest_homeassistant_custom_components.common import (
+    from pytest_homeassistant_custom_component.plugins import (  # noqa: F401
         enable_custom_integrations,
     )
 
     @pytest.fixture(autouse=True)
     def auto_enable_custom_integrations(
-        enable_custom_integrations: None,
-    ) -> Generator[None, None, None]:
+        enable_custom_integrations: None,  # noqa: F811
+    ) -> Generator[None]:
         """Enable custom integrations defined in the test tree."""
         yield
 except ImportError:
