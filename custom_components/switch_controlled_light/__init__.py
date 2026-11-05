@@ -8,7 +8,6 @@ from types import MappingProxyType
 from typing import Any
 
 from homeassistant.components import switch as switch_domain
-from homeassistant.components import timer
 from homeassistant.config_entries import ConfigEntry, ConfigSubentry
 from homeassistant.const import ATTR_ENTITY_ID, CONF_NAME, Platform
 from homeassistant.core import Event, HomeAssistant, callback
@@ -24,6 +23,7 @@ from .const import (
     CONF_CONTROL_LIGHTS,
     CONF_SWITCHES,
     DOMAIN,
+    EVENT_TIMER_FINISHED,
     PLATFORMS,
     SUBENTRY_TYPE_LIGHT,
 )
@@ -338,7 +338,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         )
 
     if timer_entity_id:
-        entry.async_on_unload(hass.bus.async_listen(timer.EVENT_TIMER_FINISHED, auto_close_switch))
+        entry.async_on_unload(hass.bus.async_listen(EVENT_TIMER_FINISHED, auto_close_switch))
 
     # Subentries and options are edited through flows which update the entry
     # directly, so reload on any entry update to (re)build entities.

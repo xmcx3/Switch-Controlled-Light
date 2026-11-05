@@ -16,3 +16,9 @@ CONF_SWITCHES = "switches"
 # Subentry type holding a single controlled light. A config entry may own
 # several of these so one switch group can drive multiple lights.
 SUBENTRY_TYPE_LIGHT = "light"
+
+# Event fired by the timer integration when a timer finishes. The constant
+# lives in ``homeassistant.components.timer`` on older releases and moved to
+# ``homeassistant.components.timer.const`` later without being re-exported, so
+# the event name is spelled out here to stay compatible with both.
+EVENT_TIMER_FINISHED = "timer.finished"
