@@ -29,19 +29,25 @@ from homeassistant.components.light import (
     LightEntity,
     LightEntityFeature,
 )
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import ConfigEntry, ConfigSubentry
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import Event, EventStateChangedData, HomeAssistant, callback
+from homeassistant.core import (
+    Event,
+    EventStateChangedData,
+    HomeAssistant,
+    callback,
+)
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.event import async_track_state_change_event
 
-from .const import CONF_CLOSE_TIMER, CONF_CONTROL_LIGHTS, CONF_SWITCHES, DOMAIN
+from . import SharedConfig
+from .const import CONF_CONTROL_LIGHTS, DOMAIN, SUBENTRY_TYPE_LIGHT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -68,24 +74,40 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    """Set up Switch Controlled Light from a config entry."""
-    name: str = entry.options["name"]
-    switch_entity_ids: list[str] = list(entry.options[CONF_SWITCHES])
-    control_light_entity_id: str = entry.options[CONF_CONTROL_LIGHTS]
-    timer_id: str | None = entry.options.get(CONF_CLOSE_TIMER)
+    """Set up Switch Controlled Light from a config entry.
 
-    async_add_entities(
-        [
-            SwitchControlledLight(
-                hass,
-                name,
-                switch_entity_ids,
-                control_light_entity_id,
-                timer_id,
+    One virtual light entity is created per ``light`` subentry, all of them
+    sharing the entry's switches and optional timer.
+    """
+    shared: SharedConfig = entry.runtime_data
+
+    for subentry in entry.get_subentries_of_type(SUBENTRY_TYPE_LIGHT):
+        control_light_entity_id = subentry.data.get(CONF_CONTROL_LIGHTS)
+        if not isinstance(control_light_entity_id, str) or not control_light_entity_id:
+            _LOGGER.warning(
+                "Skipping light subentry %s of %s: no controlled light configured",
+                subentry.subentry_id,
                 entry.entry_id,
             )
-        ]
-    )
+            continue
+
+        # Each light subentry owns its own device. HA's device registry only
+        # allows a device to belong to one config subentry (see
+        # ``helpers/device_registry.py``), so multiple lights cannot share one
+        # device. Registering the entities with their subentry id also keeps the
+        # device and the entities attributed to the same subentry in the UI.
+        async_add_entities(
+            [
+                SwitchControlledLight(
+                    hass,
+                    shared,
+                    subentry,
+                    control_light_entity_id,
+                    entry.entry_id,
+                )
+            ],
+            config_subentry_id=subentry.subentry_id,
+        )
 
 
 class SwitchControlledLight(LightEntity):
@@ -97,29 +119,42 @@ class SwitchControlledLight(LightEntity):
     def __init__(
         self,
         hass: HomeAssistant,
-        name: str,
-        switch_entity_ids: list[str],
+        shared: SharedConfig,
+        subentry: ConfigSubentry,
         control_light_entity_id: str,
-        timer_id: str | None,
         entry_id: str,
     ) -> None:
         """Initialize the Switch Controlled Light."""
         self._hass = hass
-        self._switch_entity_ids = switch_entity_ids
+        self._switch_entity_ids = shared.switch_entity_ids
         self._control_light_entity_id = control_light_entity_id
-        self._timer_id = timer_id
+        self._timer_id = shared.timer_entity_id
 
         # Until the controlled light has reported state we cannot derive
         # accurate capabilities; fall back to on/off as the safe default.
         self._attr_color_mode: ColorMode | str | None = ColorMode.UNKNOWN
         self._attr_supported_color_modes: set[ColorMode | str] | None = {ColorMode.ONOFF}
 
-        self._attr_unique_id = f"{entry_id}_{control_light_entity_id}"
+        # Each light has its own device, attributed to its config subentry, so
+        # the device page groups it under the right "light" subentry. The
+        # device name is the per-light subentry title.
+        self._attr_name = subentry.title
+        self._attr_unique_id = f"{entry_id}_{subentry.subentry_id}"
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, entry_id)},
-            name=name,
+            identifiers={(DOMAIN, subentry.subentry_id)},
+            name=subentry.title,
             manufacturer="Switch Controlled Light",
         )
+        # The entity id follows the controlled light so the virtual light is
+        # easy to correlate with the light it mirrors. A valid entity id with
+        # this platform's domain is a suggestion, not a hard assignment: HA
+        # derives ``internal_integration_suggested_object_id`` from it, so it
+        # is never device-name prefixed and never hits the invalid-id (2027.2)
+        # or wrong-domain (2027.5) deprecations. Registry appends a numeric
+        # suffix when the controlled light itself owns that entity id.
+        # Existing entries keep their entity id: the unique id is unchanged,
+        # so the registry entry is reused and its entity id is not regenerated.
+        self.entity_id = control_light_entity_id
 
     async def async_added_to_hass(self) -> None:
         """Register state change listeners when the entity is added."""

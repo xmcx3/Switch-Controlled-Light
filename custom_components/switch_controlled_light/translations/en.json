@@ -4,11 +4,10 @@
         "step": {
             "user": {
                 "title": "Switch Controlled Light",
-                "description": "Create a virtual light that is only on when every selected switch is on. State, brightness, color and effects mirror the chosen light entity.",
+                "description": "Create a switch group that controls one or more lights. The virtual lights are only on when every selected switch is on; state, brightness, color and effects mirror the chosen light entities. You will add the first controlled light in the next step.",
                 "data": {
                     "name": "Name",
                     "switches": "Required switches",
-                    "control_lights": "Controlled light",
                     "timer": "Auto-close timer (optional)"
                 }
             }
@@ -21,12 +20,58 @@
         "step": {
             "init": {
                 "title": "Switch Controlled Light",
-                "description": "Update the switches, controlled light and optional auto-close timer.",
+                "description": "Update the switches and optional auto-close timer. To delete a single controlled light, select it under \"Controlled light to delete\" and confirm in the next step. Deleting a light only removes that light; to remove the whole switch group, delete this integration entry instead.",
                 "data": {
                     "switches": "Required switches",
-                    "control_lights": "Controlled light",
-                    "timer": "Auto-close timer (optional)"
+                    "timer": "Auto-close timer (optional)",
+                    "delete_light": "Controlled light to delete (optional)"
                 }
+            },
+            "delete_light": {
+                "title": "Delete controlled light",
+                "description": "Delete {name}? Only this controlled light is removed. The switch group and its other lights are kept.",
+                "data": {
+                    "confirm_delete": "Yes, delete this controlled light"
+                }
+            }
+        },
+        "error": {
+            "delete_not_confirmed": "Confirm the deletion to remove the controlled light.",
+            "light_not_found": "The selected controlled light no longer exists."
+        }
+    },
+    "config_subentries": {
+        "light": {
+            "entry_type": "Controlled light",
+            "initiate_flow": {
+                "user": "Add controlled light"
+            },
+            "step": {
+                "user": {
+                    "title": "Add controlled light",
+                    "description": "Add another light to the switch group of {name}.",
+                    "data": {
+                        "name": "Name",
+                        "control_lights": "Controlled light"
+                    }
+                },
+                "reconfigure": {
+                    "title": "Edit controlled light",
+                    "description": "Change the light controlled by the switch group of {name}.",
+                    "data": {
+                        "name": "Name",
+                        "control_lights": "Controlled light"
+                    }
+                },
+                "delete": {
+                    "title": "Delete controlled light",
+                    "description": "Delete the controlled light {name}? Only this light is removed. The switch group and its other lights are kept."
+                }
+            },
+            "abort": {
+                "already_configured": "This light is already controlled by this switch group.",
+                "reconfigure_successful": "The controlled light was updated.",
+                "delete_successful": "The controlled light was deleted."
             }
         }
     }

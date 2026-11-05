@@ -44,12 +44,27 @@ and effects — but is only considered *on* when every selected switch is on.
 
 You will be asked for:
 
-- **Name** — the friendly name used for the device and the virtual light.
+- **Name** — the friendly name of the switch group.
 - **Required switches** — one or more switches; every one must be on for the
-  virtual light to report `on`.
-- **Controlled light** — the underlying light entity whose state is mirrored.
+  virtual lights to report `on`.
 - **Auto-close timer (optional)** — a `timer.*` entity that is restarted on
   every on/off action; when it finishes, the required switches are turned off.
+
+You are then asked for the first controlled light:
+
+- **Name** — the friendly name for this virtual light.
+- **Controlled light** — the underlying light entity whose state is mirrored.
+
+The switch group is configured once and can drive any number of lights. Use
+*Add light* on the integration's device page to attach another controlled light
+to the same switches and timer. All lights of a switch group share the group's
+device, and each one is its own virtual light entity that can be turned on or
+off independently.
+
+To delete a single controlled light without removing the switch group, open the
+integration's *Configure* dialog, select the light under *Controlled light to
+delete* and confirm. Removing the whole integration entry deletes the switch
+group and all of its lights.
 
 ## Limitations
 
@@ -63,8 +78,9 @@ You will be asked for:
 
 ```bash
 # Lint and format
-uv run prek run --all-files
+uv run ruff check
+uv run ruff format
 
 # Run tests
-uv run pytest tests/test_config_flow.py
+uv run pytest
 ```

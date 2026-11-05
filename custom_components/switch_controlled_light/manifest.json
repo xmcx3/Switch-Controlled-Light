@@ -1,7 +1,7 @@
 {
   "domain": "switch_controlled_light",
   "name": "Switch Controlled Light",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "codeowners": [
     "@xmcx3"
   ],

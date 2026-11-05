@@ -4,11 +4,10 @@
         "step": {
             "user": {
                 "title": "开关控制灯",
-                "description": "创建一个虚拟灯,只有当所有选中的开关都处于开启状态时它才会亮起。其状态、亮度、颜色和效果会镜像所选灯实体。",
+                "description": "创建一个开关组,用它控制一个或多个灯。只有当所有选中的开关都处于开启状态时,虚拟灯才会亮起;其状态、亮度、颜色和效果会镜像所选灯实体。下一步将添加第一个受控灯。",
                 "data": {
                     "name": "名称",
                     "switches": "必需的开关",
-                    "control_lights": "受控灯",
                     "timer": "自动关闭定时器(可选)"
                 }
             }
@@ -21,12 +20,58 @@
         "step": {
             "init": {
                 "title": "开关控制灯",
-                "description": "更新所需的开关、受控灯以及可选的自动关闭定时器。",
+                "description": "更新所需的开关以及可选的自动关闭定时器。如果要删除单个受控灯,请在「要删除的受控灯」中选择它,并在下一步确认。删除受控灯只会移除该灯;如果要删除整个开关组,请删除此集成条目。",
                 "data": {
                     "switches": "必需的开关",
-                    "control_lights": "受控灯",
-                    "timer": "自动关闭定时器(可选)"
+                    "timer": "自动关闭定时器(可选)",
+                    "delete_light": "要删除的受控灯(可选)"
                 }
+            },
+            "delete_light": {
+                "title": "删除受控灯",
+                "description": "确定要删除 {name} 吗?只会移除这个受控灯,开关组及其他受控灯都会保留。",
+                "data": {
+                    "confirm_delete": "是,删除这个受控灯"
+                }
+            }
+        },
+        "error": {
+            "delete_not_confirmed": "请先确认,才能删除受控灯。",
+            "light_not_found": "所选的受控灯已不存在。"
+        }
+    },
+    "config_subentries": {
+        "light": {
+            "entry_type": "受控灯",
+            "initiate_flow": {
+                "user": "添加受控灯"
+            },
+            "step": {
+                "user": {
+                    "title": "添加受控灯",
+                    "description": "为 {name} 的开关组再添加一个灯。",
+                    "data": {
+                        "name": "名称",
+                        "control_lights": "受控灯"
+                    }
+                },
+                "reconfigure": {
+                    "title": "编辑受控灯",
+                    "description": "更改 {name} 的开关组所控制的灯。",
+                    "data": {
+                        "name": "名称",
+                        "control_lights": "受控灯"
+                    }
+                },
+                "delete": {
+                    "title": "删除受控灯",
+                    "description": "确定要删除受控灯 {name} 吗?只会移除这个灯,开关组及其他受控灯都会保留。"
+                }
+            },
+            "abort": {
+                "already_configured": "此灯已由此开关组控制。",
+                "reconfigure_successful": "受控灯已更新。",
+                "delete_successful": "受控灯已删除。"
             }
         }
     }

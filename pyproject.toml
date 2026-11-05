@@ -1,13 +1,15 @@
 [project]
 name = "switch-controlled-light"
-version = "0.2.0"
+version = "0.3.0"
 description = "Virtual light entity mirroring a light while every required switch is on."
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.14.2"
 license = { text = "MIT" }
 dependencies = [
     # Pin to the HA version you target in production. Adjust as needed.
-    "homeassistant>=2025.1.0",
+    # NOTE: pytest-homeassistant-custom-component pins an exact homeassistant
+    # version, so this floor must match the phcc release used by the dev group.
+    "homeassistant>=2026.10.4",
 ]
 
 [dependency-groups]
